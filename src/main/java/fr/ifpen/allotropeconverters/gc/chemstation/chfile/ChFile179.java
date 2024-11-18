@@ -34,7 +34,7 @@ class ChFile179 extends ChFile {
         input.seek(DATA_START);
 
         for (int i = 0; i < numberOfPoints; i++) {
-            values.add(unitConverter.convert(readLittleEndianDouble(input) * yScaling));
+            values.add(unitConverter.convert(readLittleEndianDouble(input) * yScaling + yOffset));
         }
     }
 }
