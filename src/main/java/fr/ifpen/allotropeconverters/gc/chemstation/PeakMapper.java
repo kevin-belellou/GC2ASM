@@ -1,23 +1,25 @@
 package fr.ifpen.allotropeconverters.gc.chemstation;
 
-import fr.ifpen.allotropeconverters.gc.schema.*;
+import fr.ifpen.allotropeconverters.gc.schema.NumberOfTheoreticalPlatesChromatography;
+import fr.ifpen.allotropeconverters.gc.schema.Peak;
+import fr.ifpen.allotropeconverters.gc.schema.PeakArea;
+import fr.ifpen.allotropeconverters.gc.schema.PeakHeight;
+import fr.ifpen.allotropeconverters.gc.schema.RelativePeakAnalyteAmount;
+import fr.ifpen.allotropeconverters.gc.schema.RetentionTime;
 
 public class PeakMapper {
 
-    PeakMapper(){}
+    PeakMapper() {}
 
     public Peak mapPeakFromCompound(CompoundType compoundType) {
         Peak peak = new Peak();
-        peak.setIdentifier(
-                compoundType.getCompoundID().toString());
-        peak.setWrittenName(
-                compoundType.getName());
+        peak.setIdentifier(compoundType.getCompoundID().toString());
+        peak.setWrittenName(compoundType.getName());
 
         PeakHeight peakHeight = new PeakHeight();
         peakHeight.setValue(Double.parseDouble(compoundType.getHeight().getContent()));
         peakHeight.setUnit(compoundType.getHeight().getUnit());
         peak.setPeakHeight(peakHeight);
-
 
         if (compoundType.getPlatesHalfWidth() != null) {
             NumberOfTheoreticalPlatesChromatography theoreticalPlatesChromatographyHalfWidth =
@@ -28,11 +30,10 @@ public class PeakMapper {
         }
 
         if (compoundType.getMeasRetTime() != null) {
-            RetentionTime retentionTime =
-                    new RetentionTime();
+            RetentionTime retentionTime = new RetentionTime();
             double fileValue = Double.parseDouble(compoundType.getMeasRetTime().getContent());
             String unit = compoundType.getMeasRetTime().getUnit();
-            if(unit.equals("min")){
+            if (unit.equals("min")) {
                 fileValue = fileValue * 60;
                 unit = "s";
             }
@@ -42,16 +43,14 @@ public class PeakMapper {
         }
 
         if (compoundType.getArea() != null) {
-            PeakArea peakArea =
-                    new PeakArea();
+            PeakArea peakArea = new PeakArea();
             peakArea.setValue(Double.parseDouble(compoundType.getArea().getContent()));
             peakArea.setUnit(formatUnitAsSI(compoundType.getArea().getUnit()));
             peak.setPeakArea(peakArea);
         }
 
         if (compoundType.getAmount() != null) {
-            RelativePeakAnalyteAmount relativePeakAnalyteAmount =
-                    new RelativePeakAnalyteAmount();
+            RelativePeakAnalyteAmount relativePeakAnalyteAmount = new RelativePeakAnalyteAmount();
             relativePeakAnalyteAmount.setValue(Double.parseDouble(compoundType.getAmount().getContent()));
             relativePeakAnalyteAmount.setUnit(compoundType.getAmount().getUnit());
             peak.setRelativePeakAnalyteAmount(relativePeakAnalyteAmount);
@@ -60,7 +59,7 @@ public class PeakMapper {
         return peak;
     }
 
-        private String formatUnitAsSI(String unit){
-            return unit.replace("*", ".");
-        }
+    private String formatUnitAsSI(String unit) {
+        return unit.replace("*", ".");
     }
+}

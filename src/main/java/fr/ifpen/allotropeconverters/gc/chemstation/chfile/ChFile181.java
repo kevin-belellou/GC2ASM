@@ -8,7 +8,8 @@ import java.util.ArrayList;
 
 class ChFile181 extends ChFile {
 
-    private static final int DATA_START = 6144; // https://github.com/chemplexity/chromatography/blob/master/Development/File%20Conversion/ImportAgilentFID.m
+    // https://github.com/chemplexity/chromatography/blob/master/Development/File%20Conversion/ImportAgilentFID.m
+    private static final int DATA_START = 6144;
     private static final int START_TIME_POSITION = 282;
     private static final int END_TIME_POSITION = 286;
     private static final int UNITS_POSITION = 4172;
@@ -17,7 +18,8 @@ class ChFile181 extends ChFile {
     private static final int DETECTOR_POSITION = 4213;
 
     ChFile181(RandomAccessFile input) throws IOException {
-        super(input, DATA_START, START_TIME_POSITION, END_TIME_POSITION, UNITS_POSITION, Y_OFFSET_POSITION, Y_SCALING_POSITION, DETECTOR_POSITION);
+        super(input, DATA_START, START_TIME_POSITION, END_TIME_POSITION, UNITS_POSITION, Y_OFFSET_POSITION, Y_SCALING_POSITION,
+              DETECTOR_POSITION);
     }
 
     @Override
@@ -25,7 +27,7 @@ class ChFile181 extends ChFile {
         input.seek(DATA_START);
 
         values = new ArrayList<>();
-        long[] buffer = new long[]{0, 0, 0};
+        long[] buffer = new long[] {0, 0, 0};
 
         UnitConverter unitConverter = unit.getConverterTo(PICO_AMPERE_UNIT);
 

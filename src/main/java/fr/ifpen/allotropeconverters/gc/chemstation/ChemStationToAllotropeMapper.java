@@ -1,6 +1,19 @@
 package fr.ifpen.allotropeconverters.gc.chemstation;
 
-import fr.ifpen.allotropeconverters.gc.schema.*;
+import fr.ifpen.allotropeconverters.gc.schema.ChromatographyColumnDocument;
+import fr.ifpen.allotropeconverters.gc.schema.DetectorControlAggregateDocument;
+import fr.ifpen.allotropeconverters.gc.schema.DetectorControlDocument;
+import fr.ifpen.allotropeconverters.gc.schema.DeviceSystemDocument;
+import fr.ifpen.allotropeconverters.gc.schema.GasChromatographyAggregateDocument;
+import fr.ifpen.allotropeconverters.gc.schema.GasChromatographyDocument;
+import fr.ifpen.allotropeconverters.gc.schema.GasChromatographyTabularEmbedSchema;
+import fr.ifpen.allotropeconverters.gc.schema.InjectionDocument;
+import fr.ifpen.allotropeconverters.gc.schema.InjectionVolumeSetting;
+import fr.ifpen.allotropeconverters.gc.schema.MeasurementAggregateDocument;
+import fr.ifpen.allotropeconverters.gc.schema.MeasurementDocument;
+import fr.ifpen.allotropeconverters.gc.schema.Peak;
+import fr.ifpen.allotropeconverters.gc.schema.PeakList;
+import fr.ifpen.allotropeconverters.gc.schema.SampleDocument;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
@@ -15,8 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-
 public class ChemStationToAllotropeMapper {
+
     private final PeakMapper peakMapper;
     private final ColumnInformationMapper columnInformationMapper;
     private final ChromatogramDataCubeMapper chromatogramDataCubeMapper;
@@ -29,27 +42,21 @@ public class ChemStationToAllotropeMapper {
         this.chromatogramDataCubeMapper = new ChromatogramDataCubeMapper();
     }
 
-    public GasChromatographyTabularEmbedSchema mapToGasChromatographySchema(
-            String folderPath) throws JAXBException, IOException {
+    public GasChromatographyTabularEmbedSchema mapToGasChromatographySchema(String folderPath) throws JAXBException, IOException {
         ChemStationResult chemStationResult = parseXmlResult(folderPath);
 
         GasChromatographyTabularEmbedSchema schema = new GasChromatographyTabularEmbedSchema();
         GasChromatographyAggregateDocument document = new GasChromatographyAggregateDocument();
 
         DeviceSystemDocument deviceSystemDocument = new DeviceSystemDocument();
-        deviceSystemDocument.setAssetManagementIdentifier(
-                ((Element) chemStationResult.acquisition.instrumentName).getTextContent());
+        deviceSystemDocument.setAssetManagementIdentifier(((Element) chemStationResult.acquisition.instrumentName).getTextContent());
 
         GasChromatographyDocument gasChromatographyDocument = new GasChromatographyDocument();
-        gasChromatographyDocument.setAnalyst(
-                ((Element) chemStationResult.sampleInformation.operator).getTextContent());
-        gasChromatographyDocument.setSubmitter(
-                ((Element) chemStationResult.sampleInformation.operator).getTextContent());
-        gasChromatographyDocument.setDeviceMethodIdentifier(
-                ((Element) chemStationResult.sampleInformation.method).getTextContent());
+        gasChromatographyDocument.setAnalyst(((Element) chemStationResult.sampleInformation.operator).getTextContent());
+        gasChromatographyDocument.setSubmitter(((Element) chemStationResult.sampleInformation.operator).getTextContent());
+        gasChromatographyDocument.setDeviceMethodIdentifier(((Element) chemStationResult.sampleInformation.method).getTextContent());
 
-        ChromatographyColumnDocument chromatographyColumnDocument =
-                columnInformationMapper.readColumnDocumentFromFile(folderPath);
+        ChromatographyColumnDocument chromatographyColumnDocument = columnInformationMapper.readColumnDocumentFromFile(folderPath);
         gasChromatographyDocument.setChromatographyColumnDocument(chromatographyColumnDocument);
 
         DetectorControlAggregateDocument detectorControlAggregateDocument = new DetectorControlAggregateDocument();
@@ -59,27 +66,19 @@ public class ChemStationToAllotropeMapper {
         detectorControlAggregateDocument.setDetectorControlDocument(List.of(detectorControlDocument));
         gasChromatographyDocument.setDetectorControlAggregateDocument(detectorControlAggregateDocument);
 
-
-
         SampleDocument sampleDocument = new SampleDocument();
-        sampleDocument.setSampleIdentifier(
-                ((Element) chemStationResult.sampleInformation.sampleName).getTextContent());
-        sampleDocument.setDescription(
-                ((Element) chemStationResult.sampleInformation.sampleInfo).getTextContent());
-        sampleDocument.setWrittenName(
-                ((Element) chemStationResult.sampleInformation.sampleName).getTextContent());
+        sampleDocument.setSampleIdentifier(((Element) chemStationResult.sampleInformation.sampleName).getTextContent());
+        sampleDocument.setDescription(((Element) chemStationResult.sampleInformation.sampleInfo).getTextContent());
+        sampleDocument.setWrittenName(((Element) chemStationResult.sampleInformation.sampleName).getTextContent());
         gasChromatographyDocument.setSampleDocument(sampleDocument);
 
         InjectionDocument injectionDocument = new InjectionDocument();
         String injectionTimeString = ((Element) chemStationResult.sampleInformation.injectionDateTime).getTextContent();
         injectionDocument.setInjectionTime(
-                LocalDateTime.parse(
-                        injectionTimeString,
-                        DateTimeFormatter.ofPattern("dd-MMM-yy, HH:mm:ss", Locale.US))
-                                .atZone(timeZone).toInstant()
-        );
-        injectionDocument.setInjectionIdentifier(
-                ((Element) chemStationResult.sampleInformation.inj).getTextContent());
+                LocalDateTime.parse(injectionTimeString, DateTimeFormatter.ofPattern("dd-MMM-yy, HH:mm:ss", Locale.US))
+                             .atZone(timeZone)
+                             .toInstant());
+        injectionDocument.setInjectionIdentifier(((Element) chemStationResult.sampleInformation.inj).getTextContent());
 
         InjectionVolumeSetting injectionVolumeSetting = new InjectionVolumeSetting();
         injectionVolumeSetting.setValue(Double.parseDouble(((Element) chemStationResult.sampleInformation.inj).getTextContent()));
@@ -88,18 +87,14 @@ public class ChemStationToAllotropeMapper {
 
         gasChromatographyDocument.setInjectionDocument(injectionDocument);
 
-
-
         MeasurementAggregateDocument measurementAggregateDocument = new MeasurementAggregateDocument();
         MeasurementDocument measurementDocument = new MeasurementDocument();
-        measurementDocument.setDetectionType(
-                ((Element) chemStationResult.chromatograms.signal.get(0).detector).getTextContent());
+        measurementDocument.setDetectionType(((Element) chemStationResult.chromatograms.signal.get(0).detector).getTextContent());
         measurementDocument.setChromatogramDataCube(
-                chromatogramDataCubeMapper.readChromatogramDataCube(new File(folderPath,"FID1A.ch").getPath())
-        );
+                chromatogramDataCubeMapper.readChromatogramDataCube(new File(folderPath, "FID1A.ch").getPath()));
 
         List<Peak> peaks = new ArrayList<>();
-        for(CompoundType compoundType: chemStationResult.results.resultsGroup.get(0).peak){
+        for (CompoundType compoundType : chemStationResult.results.resultsGroup.get(0).peak) {
             peaks.add(peakMapper.mapPeakFromCompound(compoundType));
         }
         PeakList peakList = new PeakList();
@@ -112,13 +107,12 @@ public class ChemStationToAllotropeMapper {
         document.setDeviceSystemDocument(deviceSystemDocument);
         document.setGasChromatographyDocument(List.of(gasChromatographyDocument));
 
-
         schema.setGasChromatographyAggregateDocument(document);
         return schema;
     }
 
-    private String getDetectorType(String detectorRawType){
-        if(detectorRawType.toLowerCase().contains("fid")) {
+    private String getDetectorType(String detectorRawType) {
+        if (detectorRawType.toLowerCase().contains("fid")) {
             return "Flame Ionization";
         } else {
             return "Unknown";
@@ -130,7 +124,7 @@ public class ChemStationToAllotropeMapper {
 
         File file = new File(folderPath, resultFileName);
 
-        JAXBContext jaxbContext   = JAXBContext.newInstance( ChemStationResult.class );
+        JAXBContext jaxbContext = JAXBContext.newInstance(ChemStationResult.class);
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
         jaxbUnmarshaller.setEventHandler(new jakarta.xml.bind.helpers.DefaultValidationEventHandler());
 

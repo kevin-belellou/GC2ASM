@@ -22,7 +22,6 @@ import static java.nio.charset.StandardCharsets.UTF_16;
 
 public final class ColumnInformationMapper {
 
-
     private static final String COLON_REGEX = "\\s*:\\s*";
     private static final String SEPARATOR_REGEX = "\\s*";
     private static final String TEXT_REGEX = "(\\S+)";
@@ -30,6 +29,7 @@ public final class ColumnInformationMapper {
     private static final String COLUMN_SEPARATOR_REGEX = "(?>\\s+|\\n+)";
 
     private static final Map<String, Boolean> COLUMN_NAMES_MAP = new LinkedHashMap<>();
+    private static final Pattern COLUMN_PATTERN;
 
     static {
         COLUMN_NAMES_MAP.put("Model#", true);
@@ -38,8 +38,6 @@ public final class ColumnInformationMapper {
         COLUMN_NAMES_MAP.put("Length", false);
         COLUMN_NAMES_MAP.put("Film thickness", false);
     }
-
-    private static final Pattern COLUMN_PATTERN;
 
     static {
         StringBuilder pattern = new StringBuilder();
@@ -69,7 +67,10 @@ public final class ColumnInformationMapper {
 
             skipToColumnInformation(acquisitionScanner);
 
-            MatchResult columnInformation = acquisitionScanner.findAll(COLUMN_PATTERN).findFirst().orElseThrow(() -> new NoSuchElementException("Incorrect column information"));
+            MatchResult columnInformation = acquisitionScanner.findAll(COLUMN_PATTERN)
+                                                              .findFirst()
+                                                              .orElseThrow(
+                                                                      () -> new NoSuchElementException("Incorrect column information"));
 
             int groupIndex = 1;
 

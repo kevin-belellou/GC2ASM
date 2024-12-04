@@ -44,7 +44,7 @@ class ChromatogramDataCubeMapper {
         return cubeStructure;
     }
 
-    private AllotropeData createAllotropeDataFromChFile(ChFile chFile){
+    private AllotropeData createAllotropeDataFromChFile(ChFile chFile) {
         Double[] xValues = this.interpolate(chFile.getStartTime(), chFile.getEndTime(), chFile.getValues().size());
         return new AllotropeData(List.of(Arrays.asList(xValues)), List.of(chFile.getValues()));
     }
@@ -61,7 +61,7 @@ class ChromatogramDataCubeMapper {
             throw new IllegalArgumentException("interpolate: illegal count!");
         }
         Double[] array = new Double[count + 1];
-        for (int i = 0; i <= count; ++ i) {
+        for (int i = 0; i <= count; ++i) {
             array[i] = start + i * (end - start) / count;
         }
         return array;

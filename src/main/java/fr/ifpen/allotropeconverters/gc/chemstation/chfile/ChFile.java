@@ -14,6 +14,13 @@ import static fr.ifpen.allotropeconverters.gc.chemstation.chfile.ReadHelpers.rea
 public abstract class ChFile {
 
     protected static final Unit<ElectricCurrent> PICO_AMPERE_UNIT = SI.PICO(SI.AMPERE);
+    protected final int dataStart; // Has no use for now
+    protected final int startTimePosition;
+    protected final int endTimePosition;
+    protected final int unitsPosition;
+    protected final int yOffsetPosition;
+    protected final int yScalingPosition;
+    protected final int detectorPosition;
 
     protected List<Double> values;
     protected Float startTime;
@@ -23,15 +30,8 @@ public abstract class ChFile {
     protected Double yOffset;
     protected String detector;
 
-    protected final int dataStart; // Has no use for now
-    protected final int startTimePosition;
-    protected final int endTimePosition;
-    protected final int unitsPosition;
-    protected final int yOffsetPosition;
-    protected final int yScalingPosition;
-    protected final int detectorPosition;
-
-    protected ChFile(RandomAccessFile input, int dataStart, int startTimePosition, int endTimePosition, int unitsPosition, int yOffsetPosition, int yScalingPosition, int detectorPosition) throws IOException {
+    protected ChFile(RandomAccessFile input, int dataStart, int startTimePosition, int endTimePosition, int unitsPosition,
+                     int yOffsetPosition, int yScalingPosition, int detectorPosition) throws IOException {
         this.dataStart = dataStart;
         this.startTimePosition = startTimePosition;
         this.endTimePosition = endTimePosition;

@@ -15,33 +15,31 @@ import java.time.ZoneOffset;
 
 public class GcToAllotropeJsonConverter {
 
-
     private final ZoneId defaultTimeZone;
     private ChemStationToAllotropeMapper chemstationMapper;
 
-    public GcToAllotropeJsonConverter(){
+    public GcToAllotropeJsonConverter() {
         defaultTimeZone = ZoneOffset.UTC;
         this.createMapper();
     }
 
-    public GcToAllotropeJsonConverter(ZoneId defaultTimeZone){
+    public GcToAllotropeJsonConverter(ZoneId defaultTimeZone) {
         this.defaultTimeZone = defaultTimeZone;
         this.createMapper();
     }
 
-    private void createMapper(){
+    private void createMapper() {
         chemstationMapper = new ChemStationToAllotropeMapper(defaultTimeZone);
     }
 
     public ObjectNode convertFile(String filePath) throws JAXBException, IOException {
-            GasChromatographyTabularEmbedSchema embedSchema =
-                    chemstationMapper.mapToGasChromatographySchema(filePath);
+        GasChromatographyTabularEmbedSchema embedSchema = chemstationMapper.mapToGasChromatographySchema(filePath);
 
-            ObjectMapper objectMapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();
+        ObjectMapper objectMapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();
 
-            objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
-            return objectMapper.valueToTree(embedSchema);
+        return objectMapper.valueToTree(embedSchema);
     }
 }
