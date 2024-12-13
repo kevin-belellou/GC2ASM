@@ -6,6 +6,7 @@ import fr.ifpen.allotropeconverters.gc.schema.PeakArea;
 import fr.ifpen.allotropeconverters.gc.schema.PeakHeight;
 import fr.ifpen.allotropeconverters.gc.schema.RelativePeakAnalyteAmount;
 import fr.ifpen.allotropeconverters.gc.schema.RetentionTime;
+import org.w3c.dom.Node;
 
 public class PeakMapper {
 
@@ -14,7 +15,7 @@ public class PeakMapper {
     public Peak mapPeakFromCompound(CompoundType compoundType) {
         Peak peak = new Peak();
         peak.setIdentifier(compoundType.getCompoundID().toString());
-        peak.setWrittenName(compoundType.getName());
+        peak.setWrittenName(compoundType.getName() instanceof Node node ? node.getTextContent() : compoundType.getName().toString());
 
         PeakHeight peakHeight = new PeakHeight();
         peakHeight.setValue(Double.parseDouble(compoundType.getHeight().getContent()));
